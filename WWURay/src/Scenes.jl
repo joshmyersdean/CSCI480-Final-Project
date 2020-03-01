@@ -50,6 +50,14 @@ struct Sphere
     material::Material
 end
 
+
+struct Portal
+    center::vec3
+    radiusX::Float64
+    radiusY::Float64
+    material::Material
+end
+
 """ Ray-sphere intersection. """
 function ray_intersect(ray::Ray, object::Sphere)
     # define constants to use later

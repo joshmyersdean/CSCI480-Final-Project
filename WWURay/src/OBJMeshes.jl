@@ -1,14 +1,14 @@
 module OBJMeshes
 
-export read_obj, write_obj, tri_vertex_str
-export cube_mesh, cylinder_mesh, sphere_mesh, estimate_normals
+export read_obj, write_obj
+export cube_mesh, cylinder_mesh, sphere_mesh, estimate_normals, portal_mesh
 export OBJTriangle, OBJMesh
 
 using FileIO
 using LinearAlgebra
 
-#push!(LOAD_PATH, pwd())
-using ..GfxBase
+push!(LOAD_PATH, pwd())
+using GfxBase
 
 
 """ OBJTriangle
@@ -28,6 +28,7 @@ mutable struct OBJMesh
     normals::Array{Vec3, 1} # all vertex normals
     triangles::Array{OBJTriangle, 1} # the OBJTriangles belonging to the mesh
 end
+
 
 """ read_obj(obj_filename)
 Read a mesh in OBJ format from file obj_filename."""
@@ -165,7 +166,7 @@ function cube_mesh()
     push!(normals, Vec3( 0, 1, 0)) # U
     push!(normals, Vec3( 0,-1, 0)) # D
     push!(normals, Vec3( 0, 0, 1)) # C
-    push!(normals, Vec3( 0, 1,-1)) # F
+    push!(normals, Vec3( 0, 0,-1)) # F
 
     # 8 faces, 2 triangles each
     push!(triangles, OBJTriangle([1,2,3], [1,2,3], [4,4,4])) # bottom face 1
@@ -181,7 +182,8 @@ function cube_mesh()
     push!(triangles, OBJTriangle([5,8,7], [1,2,3], [3,3,3])) # top face 1
     push!(triangles, OBJTriangle([5,7,6], [1,3,4], [3,3,3])) # top face 2
 
-    mesh = OBJMesh(positions, uvs, normals, triangles)
+    # julia automatically returns the last value in the function:
+    OBJMesh(positions, uvs, normals, triangles)
 
 end
 
@@ -190,10 +192,34 @@ end
 Return a new OBJMesh object approximation of a cylinder with radius 1 and
 height 2, centered at the origin. The logitudinal axis is aligned with y, and
 it is tesselated with n divisions arranged radially around the outer surface.
-The ends of the cylinder are disc-shaped caps parallel to the xz plane. See the
-assignment writeup for a diagram and details.
+The ends of the cylinder are disc-shaped caps parallel to the xz plane.
 """
-function cylinder_mesh(n)
+
+function portal_mesh()
+    positions = []
+    uvs = []
+    normals = []
+    triangles = [] 
+    push!(positions, Vec3(0,0,1)) # top of cap
+    push!(normals, Vec3(0,0,1))  
+    n = 16 
+    for i = 1:n+1
+        ratio = i/n  
+        theta = 2*pi*ratio
+        push!(positions, Vec3(-sin(theta)*.75, -cos(theta)*1.25, 1))
+        push!(normals, Vec3(-sin(theta),  -cos(theta), 1))
+    end
+	length_pos = length(positions)
+     for i=2:length_pos
+       push!(triangles, OBJTriangle([i, 1,i+1],[i+length_pos,1,i+length_pos],[1,1,1]))
+     end
+     OBJMesh(positions,uvs ,normals,triangles) 
+end
+
+
+
+
+function cylinder_mesh(divisionsU)
   positions = []
   uvs = []
   normals = []
@@ -275,121 +301,99 @@ function cylinder_mesh(n)
   push!(triangles, OBJTriangle([length_pos-1, 3, 1], [2*length_pos-1,length_pos+3,1], [1,1,1]))
   push!(triangles, OBJTriangle([length_pos, 2, 4], [2*length_pos,2,length_pos+4], [2,2,2]))
 
-  OBJMesh(positions,uvs ,normals,triangles) 
+  OBJMesh(positions,uvs ,normals,triangles)
 end
 
 
-""" sphere_mesh(n, m)
+""" sphere_mesh(n, m
 Create a Latitude-Longitude-tesselated approximation of a sphere with radius 1
 centered at the origin. There are n divisions around the equator and m
 divisions from pole to pole along each line of longitude. The North pole is at
-(0,1,0), the South pole at (0,-1,0), and points on the Greenwich meridian are
+(0,1,0), the South pole at (0,-1,0)((-1, and points on the Greenwich meridian are
 in the x = 0 plane with z > 0. The u texture coordinate depends on longitude,
 with u=0 at 180 degrees West and u=1 at 180 degrees East. The v texture
 coordinate varies with latitude with v=0 at the South pole and v=1 at the North
 pole. Normals should be normal to the ideal sphere surface. See the assignment
 for a diagram and further details. """
 function sphere_mesh(n, m)
-    # Drop your A1 implementation in here.
-    mesh = OBJMesh([], [], [], [])
-    points = mesh.positions
-    uvs = mesh.uvs
-    normals = mesh.normals
-    triangles = mesh.triangles
-    # Indexing:
-    # Points and normals - non-pole vertices are stored in m contiguous rings
-    # of n points of equal latitude starting at -180 lon, closest lat to south
-    # pole, increasing in the positive direction.
-    #
-    # Textures - same, except the rings have n+1 points to account for
-    # overlapping texture at the lon -180/180 seam.
+    positions = []
+    uvs = []
+    normals = []
+    triangles = []
 
-    mod1n(i, n) = (i-1) % n + 1 # mod a 1-indexed vertex number by n so we wrap from n back to 1
+    u = 2 * pi / n # normalize 
+    v = pi / m # normalize
+    
+    push!(positions, Vec3(0, -1, 0)) # bottom pole
+    push!(normals, Vec3(0,-1,0)) 
 
-    # index of the point at lat i, lon j
-    # where i starts from the vertex above the south pole and j starts at -z
-    pij(i, j) = n * (i-1) + mod1n(j, n)
-    nij = pij
-    uij(i, j) = (n+1) * (i-1) + j
-
-
-    # all vertices except poles:
-    for lat in range(-pi/2, length=m+1, stop=pi/2)[2:end-1]
-        v = (lat + pi/2) / (pi) # shared among all at this latitude
-        for lon in range(-pi, length=n+1, stop=pi)[1:end-1]
-
-            x = sin(lon) * cos(lat)
-            y = sin(lat)
-            z = cos(lon) * cos(lat)
-
-            push!(points, Vec3(x, y, z))
-            push!(normals, Vec3(x, y, z))
-
-            u = (lon + pi) / (2*pi)
-            push!(uvs, Vec2(u, v))
-        end
-        # wraparound texture coordinate for first vertex
-        push!(uvs, Vec2(1, v))
-
+    push!(positions, Vec3(0, 1, 0)) # top pole
+    push!(normals, Vec3(0,1,0))    
+    
+    # In this next block we convert x,y,z to spherical coordinates and 
+    # add the vectors to the positions array
+    for i=1:m-1  
+      theta = (pi / 2) - (i * v) # π/2 to -π/2
+      y = sin(theta) # Spherical y coord 
+      for j=0:n-1
+        phi = j * u
+        x = cos(theta) * sin(phi) # Spherical x coord
+        z = cos(theta) * cos(phi) # spherical y coord
+        push!(positions, Vec3(-x, -y, -z)) # negative as we start from the bottom
+        push!(normals, Vec3(-x,-y,-z))
+      end
+    end
+    length_pos = length(positions)
+    # uv coords
+    for i=0:m
+      for j=0:n
+        push!(uvs, Vec2(j/n,i/m))
+      end
+    end
+   
+    # create the bottom "ring"
+    for i=1:n-1
+      push!(triangles, OBJTriangle([1, i+3,i+2],[i,i+n+1,i+n],[1,i+3,i+2]))
     end
 
-    # south pole
-    # north pole
+    # missing piece of bottom ring
+    push!(triangles, OBJTriangle([1,3,n+2],[n, 2*n+1,2*n],[1,3,n+2]))
+    
+    t1, t2 = n+1,2*n+2 # texture counters
+    for i=3:length_pos-n
+      # if i is a multiple of m we subtract m from the first and second coordinates, respectively.
+      if ((i-2)%n) == 0
+       push!(triangles,OBJTriangle([i,i-n+1,i+n],[t1,t1+1,t2],[i,i-n+1,i+n]))
+       push!(triangles,OBJTriangle([i-n+1,i+1,i+n],[t1+1,t2+1,t2],[i-n+1,i+1,i+n]))
+       t1 +=2 # textures increment twice as fast
+       t2 += 2
+       continue
+      end
 
-    # create triangles
-    for i in 1:m-2 # lat index
-        for j in 1:n # lon index
-            # upward-pointy triangle
-            pos = [pij(i,j), pij(i, j+1), pij(i+1,j)] # downleft downright upleft 
-            uv =  [uij(i,j), uij(i, j+1), uij(i+1, j)]
-            nor = pos
-            push!(triangles, OBJTriangle(pos, uv, nor))
-
-            # downward-pointy triangle
-            pos = [pij(i,j+1), pij(i+1, j+1), pij(i+1,j)] # downright upright upleft 
-            uv =  [uij(i,j+1), uij(i+1, j+1), uij(i+1,j)] # downright upright upleft 
-            nor = pos
-            push!(triangles, OBJTriangle(pos, uv, nor))
-        end
+     # for most of the triangles, i is not a multiple of m, add m to 3rd coord.
+     push!(triangles, OBJTriangle([i, i+1,i+n],[t1,t1+1,t2],[i, i+1,i+n]))
+     push!(triangles, OBJTriangle([i+1,i+1+n,i+n],[t1+1,t2+1,t2],[i+1,i+1+n,i+n]))
+     t1 += 1 # textures increment normally here
+     t2 += 1
     end
-
-
-    # pole points (2), starting at index m*n
-    push!(points, Vec3(0, -1, 0)) # south pole
-    push!(points, Vec3(0, 1, 0)) # north pole
-
-    # pole normals (2), starting at index m*n
-    push!(normals, Vec3(0, -1, 0)) # south pole
-    push!(normals, Vec3(0, 1, 0)) # south pole
-
-    south_i = (m-1)*n+1
-    north_i = (m-1)*n+2
-
-    # pole uvs (2n), starting at m*(n+1); m*(n+odd) is south, m*(n+even) is north
-    uv_offset = m*n
-    for j in 1:n # lon index
-    #for i in range(0, 1, size=n+1)[1:end-1]
-        # downward-pointy triangles with the south pole:
-        u = j / n # they get the rightward u texture coordinate
-        push!(uvs, Vec2(u, 0)) # texture coord
-        pos = [south_i, pij(1, j+1), pij(1, j)] # southpole, upright, upleft
-        nor = pos
-        uv = [length(uvs), uij(1, j+1), uij(1, j)]
-        push!(triangles, OBJTriangle(pos, uv, nor))
-
-        # upward-pointy triangles with the north pole
-        u = (j-1) / n # they get the left-ward u texture coordinate
-        push!(uvs, Vec2(u, 1)) # texture coord
-        pos = [pij(m-1, j), pij(m-1, j+1), north_i] # downleft, downright, northpole
-        nor = pos
-        uv = [uij(m-1, j), uij(m-1, j+1), length(uvs)]
-        push!(triangles, OBJTriangle(pos, uv, nor))
+    
+    # top "ring"
+    for i =length_pos-n+1:length_pos-1
+      push!(triangles,OBJTriangle([i,i+1,2],[t1,t1+1,t1+1+n],[i,i+1,2]))
+      t1 += 1
+      t2 += 1
     end
+    # missing bit of the top "ring"
+    push!(triangles,OBJTriangle([length_pos,length_pos-n+1,2],[t1,t1+1,t1+1+n],
+                                [length_pos, length_pos-n+1,2]))
 
-    mesh
+   deleteat!(uvs, 1) # delete the first/last index of texture coords as it is unneeded
+   deleteat!(uvs, length(uvs))
+   OBJMesh(positions,uvs, normals, triangles)
 end
 
-""" estimate_normals(mesh::OBJMesh)
+""" 
+    estimate_normals(mesh::OBJMesh)
 Estimates normals for the given mesh. Overwrites any existing normals and returns a new OBJMesh object.
 """
 function estimate_normals(mesh::OBJMesh)
@@ -424,5 +428,3 @@ function estimate_normals(mesh::OBJMesh)
 end
 
 end # module OBJMeshes
-
-
