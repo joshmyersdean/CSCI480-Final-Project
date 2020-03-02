@@ -52,7 +52,7 @@ end
 
 
 struct Portal
-    center::vec3
+    center::Vec3
     radiusX::Float64
     radiusY::Float64
     material::Material
