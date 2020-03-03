@@ -155,6 +155,9 @@ end
 
 
 function ray_intersect(ray::Ray, object::Triangle)
+
+
+
     # vertices
     x = get_vertex(object, 1)
     y = get_vertex(object, 2)

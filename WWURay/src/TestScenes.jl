@@ -149,13 +149,6 @@ function scene_6()
 end
 
 
-    #push!(objs, Sphere(Vec3(0, 0, -605), 600, Material(Lambertian(), 0.5, nothing, white)))
-
-    #push!(objs, Sphere(Vec3(0, -1, -3), 1, RGB{Float32}(1.0, 0.0, 0.0), 500, 0.2))
-    #push!(objs, Sphere(Vec3(2, 0, -4), 1, RGB{Float32}(0.0, 0.0, 1.0), 500, 0.3))
-    #push!(objs, Sphere(Vec3(-2, 0, -4), 1, RGB{Float32}(0.0, 1.0, 0.0), 10, 0.4))
-    #push!(objs, Sphere(Vec3(0, -5001, 0), 5000, RGB{Float32}(1.0, 1.0, 0.0), 1000, 0.5))
-
 
 """ Take the OBJMesh mesh and return an array of Triangles from the mesh
 with the given material, after scaling the mesh positions by scale and moving
@@ -168,6 +161,11 @@ function mesh_helper(mesh, material, scale=1.0, translation=Vec3(0,0,0))
 
     create_triangles(mesh, material)
 end
+
+
+
+
+
 
 function scene_7()
     bg = black
@@ -362,12 +360,17 @@ function portalScene2(img_height, img_width)
     push!(objs, Sphere(Vec3(0, -5001, 0), 5000, Material(Lambertian(), 0.03, nothing, RGB{Float32}(0.8, 0.8, 1.0))))
 
 	#left cube
-    cube_mat = Material(Lambertian(), 0.0, Texture("data/asdf.png", false), white)
+    cube_mat = Material(Lambertian(), 0.0, Texture("data/wall.png", false), white)
     append!(objs, mesh_helper(cube_mesh(), cube_mat, 1.0, Vec3(0, 0, 0)))
 
 	#right cube
     cube_mat = Material(Lambertian(), 0.0, Texture("data/wall.png", false), white)
     append!(objs, mesh_helper(cube_mesh(), cube_mat, 1.0, Vec3(2.005, 0, 2.005)))
+
+	#left portal
+    portal_mat = Material(Lambertian(), 0.8,  nothing, RGB{Float32}(0.9, 0.01, 0.01))
+    portal = read_obj("data/portal.obj")
+    append!(objs, mesh_helper(portal_mesh(2,2), portal_mat, 0.5, Vec3(0, 0, 0.52)))
     
     #companion cube
     cube_mat = Material(Lambertian(), 0.0, Texture("data/companionCube.png", false), white)

@@ -1,7 +1,7 @@
 module OBJMeshes
 
 export read_obj, write_obj, tri_vertex_str
-export cube_mesh, cylinder_mesh, sphere_mesh, estimate_normals
+export cube_mesh, cylinder_mesh, sphere_mesh, estimate_normals, portal_mesh
 export OBJTriangle, OBJMesh
 
 using FileIO
@@ -195,25 +195,32 @@ it is tesselated with n divisions arranged radially around the outer surface.
 The ends of the cylinder are disc-shaped caps parallel to the xz plane.
 """
 
-function portal_mesh()
+function portal_mesh(x, y)
+
+
     positions = []
     uvs = []
     normals = []
     triangles = [] 
     push!(positions, Vec3(0,0,1)) # top of cap
     push!(normals, Vec3(0,0,1))  
-    n = 16 
+    n = 20
     for i = 1:n+1
         ratio = i/n  
         theta = 2*pi*ratio
-        push!(positions, Vec3(-sin(theta)*.75, -cos(theta)*1.25, 1))
+        push!(positions, Vec3(-sin(theta)*x, -cos(theta)*y, 1))
         push!(normals, Vec3(-sin(theta),  -cos(theta), 1))
     end
 	length_pos = length(positions)
-     for i=2:length_pos
+     for i=1:length_pos-1
        push!(triangles, OBJTriangle([i, 1,i+1],[i+length_pos,1,i+length_pos],[1,1,1]))
      end
-     OBJMesh(positions,uvs ,normals,triangles) 
+     OBJMesh(positions, uvs, normals, triangles)
+
+
+
+
+
 end
 
 
