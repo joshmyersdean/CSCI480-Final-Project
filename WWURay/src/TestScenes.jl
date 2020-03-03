@@ -21,28 +21,30 @@ function camera_1(img_height, img_width)
     CanonicalCamera(img_height, img_width)
 end
 
-function camera_2(img_height, img_width)
-    eye = Vec3(20, 4, 10)
-    view = Vec3(-1, 0, -5) - eye
+
+
+function camera_portal1(img_height, img_width)
+    eye = Vec3(0, 3, 100)
+    view = Vec3(0, 0, 0) - eye
     up = Vec3(0, 1, 0)
     focal = 8.0
     Cameras.PerspectiveCamera(eye, view, up, focal, img_height, img_width)
 end
 
-function camera_3(img_height, img_width)
-
-    Cameras.PerspectiveCamera(
-                 Vec3(-1, 0.8, -1.2),  # eye::Vec3
-                 Vec3(1, -1, -1), # view::Vec3
-                 Vec3(0, 1, 0),   # up::Vec3
-                 0.3,     # focal::Real
-                 img_height, # canv_height::Int
-                 img_width) # canv_width::Int)
+function camera_portal2(img_height, img_width)
+    eye = Vec3(-2, 0.5, 4)
+    view = Vec3(0, 0, 2) - eye
+    up = Vec3(0, 1, 0)
+    focal = 1.0
+    Cameras.PerspectiveCamera(eye, view, up, focal, img_height, img_width)
 end
 
 
 
-cameras = [camera_1, camera_2, camera_3]
+
+
+
+cameras = [camera_1, camera_portal1, camera_portal2]
 
 function get_camera(i, img_height, img_width)
     cameras[i](img_height, img_width)
@@ -173,7 +175,7 @@ function scene_7()
 
     # add a bunny:
     bunny_mat = Material(Lambertian(), 0.0, nothing, RGB{Float32}(0.6, 0.5, 0.5))
-    bunny = read_obj("../data/bunny.obj")
+    bunny = read_obj("data/bunny.obj")
     append!(objs, mesh_helper(bunny, bunny_mat, 1.0, Vec3(0.2, 0, -5)))
 
     # add a cube
@@ -198,8 +200,7 @@ function scene_9()
     objs = []
 
     push!(objs, Sphere(Vec3(0, -5001, 0), 5000, Material(Lambertian(), 0.2, nothing, RGB{Float32}(0.8, 0.8, 1.0))))
-
-    sphere_material = Material(Lambertian(), 0.0, Texture("../data/earth.png", false), nothing)
+    sphere_material = Material(Lambertian(), 0.0, Texture("data/earth.png", false), nothing)
     push!(objs, Sphere(Vec3(-1.25, 0, -6), 1, sphere_material))
 
     sphere_m = sphere_mesh(32, 16)
@@ -210,7 +211,7 @@ function scene_9()
     end
     append!(objs, create_triangles(sphere_m, sphere_material))
 
-    cube_mat = Material(Lambertian(), 0.0, Texture("../data/1.png", false), white)
+    cube_mat = Material(Lambertian(), 0.0, Texture("data/1.png", false), white)
     append!(objs, mesh_helper(cube_mesh(), cube_mat, 0.5, Vec3(-1, -1, -3)))
 
     lights = [ DirectionalLight(0.4, Vec3(0,1,0)),
@@ -221,35 +222,182 @@ function scene_9()
 end
 
 
-function artifact_myersdj(img_height, img_width)
-    bg = white 
+#artifact for Ryan Wells
+function artifact_wellsr8(img_height, img_width)
+
+
+    bg = RGB{Float32}(0.2,0.2,0.2)
     objs = []
 
-    water_mat = Material(BlinnPhong(red, 10), 0.0, nothing, RGB{Float32}(.2, .52, 1.0))
-    bunny_mat = Material(BlinnPhong(blue, 100), 0.0, nothing, RGB{Float32}(1, .2, .81))
-    bunny = read_obj("../data/bunny.obj")
-    push!(objs, Sphere(Vec3(6,8,-30), 4, water_mat))
-    push!(objs, Sphere(Vec3(0,-101,-10), 100, water_mat))
-    append!(objs, mesh_helper(bunny, bunny_mat, 2.0, Vec3(0.2, .5, -7)))
+    num = 0.0
+    darker = 0.0
+
+    # add bunnies:
+    for i = 1:10
+        bunny_mat = Material(Lambertian(), 0.0, nothing, RGB{Float32}(1, 0.4 + darker, 0.4 + darker))
+        bunny = read_obj("data/bunny.obj")
+									      #left/right      up/down      front/back
+        append!(objs, mesh_helper(bunny, bunny_mat, 1.0 - (darker / 1.5), Vec3(-1.2 + (num * 7.5), 0 + darker, -5 - (num * 7))))   
+        num += 0.1
+		darker -= 0.05
+    end
+
+    # add a cube
+    cube_mat = Material(Lambertian(), 0.40, nothing, black)
+    append!(objs, mesh_helper(cube_mesh(), cube_mat, 10.0, Vec3(0, -12, 0)))
+
+    # add a cube
+    cube_mat = Material(Lambertian(), 0.40, nothing, RGB{Float32}(0.1, 0.01, 0.01))
+    append!(objs, mesh_helper(cube_mesh(), cube_mat, 15.0, Vec3(0, 0, -32)))
+
 
     lights = [ PointLight(0.5, Vec3(1,2,-5)),
-               PointLight(0.5, Vec3(-1,-1,-3)),
-               DirectionalLight(0.8, Vec3(3,-1,1)),
-               DirectionalLight(0.3, Vec3(0,1,0))
-              ]
+               DirectionalLight(0.3, Vec3(0,0,1)),
+               DirectionalLight(0.3, Vec3(0,1,1)),
+               DirectionalLight(0.3, Vec3(1,1,1)),
+               DirectionalLight(0.3, Vec3(0,1,0)) ]
 
-    (Scene(bg, objs, lights), camera_1(img_height, img_width))
+	lights = [PointLight(0.8, Vec3(0,0,0)),
+	PointLight(0.8, Vec3(0,5,0))]
+
+    return (Scene(bg, objs, lights), camera_1(img_height, img_width))
 
 end
 
-function artifact_ricenad(img_height, img_width)
-    ##################################
-    # TODO 10 - one per group member #
-    ##################################
+
+
+function artifact_shinm(img_height, img_width)
+    bg = black
+
+    objs = [
+            Sphere(Vec3( 0, 2.5, -4), 1.5, Material(Lambertian(), 0.6, nothing, white)),               # reflection
+        
+            Sphere(Vec3(-1.5, -0.5, -2), 0.4, Material(BlinnPhong(white, 10), 0.0, nothing, red)),
+            Sphere(Vec3(-0.5, -0.5, -5), 0.3,  Material(BlinnPhong(white, 10), 0.0, nothing, blue)),
+            Sphere(Vec3(0,  -0.5, -5), 0.3, Material(BlinnPhong(white, 10), 0.0, nothing, green)),
+            Sphere(Vec3(1, -0.5, -3), 0.4, Material(Lambertian(), 0.0, Texture("data/ball.png", false), nothing)),
+            
+            Sphere(Vec3(  0, -5001, 0), 5000, Material(Lambertian(), 0.5, nothing, purple)) # floor
+           ]
+
+    lights = [ PointLight(0.4, Vec3(-1, 1, 0)), 
+               DirectionalLight(1.0, Vec3(1, 0.5, -0.1))]
+
+   return (Scene(bg, objs, lights), camera_2(img_height, img_width))
+end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function portalScene1(img_height, img_width)
+
+    bg = black
+
+    objs = []
+
+
+	#make a the ground
+    push!(objs, Sphere(Vec3(0, -5001, 0), 5000, Material(Lambertian(), 0.02, nothing, RGB{Float32}(0.8, 0.8, 1.0))))
+
+	#central cube
+    cube_mat = Material(Lambertian(), 0.0, Texture("data/1.png", false), white)
+    append!(objs, mesh_helper(cube_mesh(), cube_mat, 1.5, Vec3(0, 0, 0)))
     
-end
-scene_11 = artifact_myersdj
+    #bunny location
+    # add a bunny:
+    bunny_mat = Material(Lambertian(), 0.02, nothing, RGB{Float32}(0.6, 0.5, 0.5))
+    bunny = read_obj("data/bunny.obj")
+    append!(objs, mesh_helper(bunny, bunny_mat, 1.0, Vec3(4, 0, 0)))
+    
+    
+    #background behind bunny
+    sphere_material = Material(Lambertian(), 0.0, Texture("data/earth.png", false), nothing)
+    push!(objs, Sphere(Vec3(6.5, 0, 0), 1, sphere_material))
+    
+    
+    lights = [ DirectionalLight(0.4, Vec3(0,1,0)),
+               DirectionalLight(0.8, Vec3(0.4,0.4,1)) ]
 
-scenes = [scene_1, scene_2, scene_3, scene_4, scene_5, scene_6, scene_7, scene_8, scene_9, artifact_ricenad, scene_11]
+
+   return (Scene(bg, objs, lights), camera_portal1(img_height, img_width))
+
+
+end
+
+
+
+
+function portalScene2(img_height, img_width)
+
+    bg = black
+
+    objs = []
+
+
+	#make a the ground
+    push!(objs, Sphere(Vec3(0, -5001, 0), 5000, Material(Lambertian(), 0.02, nothing, RGB{Float32}(0.8, 0.8, 1.0))))
+
+	#left cube
+    cube_mat = Material(Lambertian(), 0.0, Texture("data/1.png", false), white)
+    append!(objs, mesh_helper(cube_mesh(), cube_mat, 1.0, Vec3(0, 0, 0)))
+
+	#right cube
+    cube_mat = Material(Lambertian(), 0.0, Texture("data/1.png", false), white)
+    append!(objs, mesh_helper(cube_mesh(), cube_mat, 1.0, Vec3(2.005, 0, 2.005)))
+    
+    #companion cube
+    cube_mat = Material(Lambertian(), 0.0, Texture("data/companionCube.png", false), white)
+    append!(objs, mesh_helper(cube_mesh(), cube_mat, 0.25, Vec3(0, -0.75, 2)))
+    
+    lights = [ 
+               DirectionalLight(0.8, Vec3(-0.4,0.4,0.4)),
+               PointLight(0.3, Vec3(-1,5,0)) ]
+
+
+   return (Scene(bg, objs, lights), camera_portal2(img_height, img_width))
+
+
+end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+scenes = [scene_1, scene_2, scene_3, scene_4, scene_5, scene_6, scene_7, scene_8, scene_9, portalScene1, portalScene2]
 
 end # module TestScenes

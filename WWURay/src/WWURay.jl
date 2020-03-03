@@ -169,15 +169,15 @@ end
 function main(scene, camera, height, width, outfile)
 
     # get the requested scene and camera
-    scene = TestScenes.get_scene(scene)
-    # case for our artifacts
+
     if scene == 10
-        scene = TestScenes.artifact_ricenad(height, width)[1]
-        camera = TestScenes.artifact_ricenad(height, width)[2]
+	scene = TestScenes.portalScene2(height, width)[1]
+        camera = TestScenes.portalScene2(height, width)[2]
     elseif scene == 11
         scene = TestScenes.artifact_myersdj(height, width)[1]
         camera = TestScenes.artifact_myersdj(height, width)[2]
     else
+    	scene = TestScenes.get_scene(scene)
         camera = TestScenes.get_camera(camera, height, width)
     end
     

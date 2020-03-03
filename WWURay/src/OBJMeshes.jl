@@ -1,14 +1,14 @@
 module OBJMeshes
 
-export read_obj, write_obj
-export cube_mesh, cylinder_mesh, sphere_mesh, estimate_normals, portal_mesh
+export read_obj, write_obj, tri_vertex_str
+export cube_mesh, cylinder_mesh, sphere_mesh, estimate_normals
 export OBJTriangle, OBJMesh
 
 using FileIO
 using LinearAlgebra
 
-push!(LOAD_PATH, pwd())
-using GfxBase
+#push!(LOAD_PATH, pwd())
+using ..GfxBase
 
 
 """ OBJTriangle
