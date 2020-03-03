@@ -324,7 +324,7 @@ function portalScene1(img_height, img_width)
     push!(objs, Sphere(Vec3(0, -5001, 0), 5000, Material(Lambertian(), 0.02, nothing, RGB{Float32}(0.8, 0.8, 1.0))))
 
 	#central cube
-    cube_mat = Material(Lambertian(), 0.0, Texture("data/1.png", false), white)
+    cube_mat = Material(Lambertian(), 0.0, Texture("data/wall.png", false), white)
     append!(objs, mesh_helper(cube_mesh(), cube_mat, 1.5, Vec3(0, 0, 0)))
     
     #bunny location
@@ -359,14 +359,14 @@ function portalScene2(img_height, img_width)
 
 
 	#make a the ground
-    push!(objs, Sphere(Vec3(0, -5001, 0), 5000, Material(Lambertian(), 0.02, nothing, RGB{Float32}(0.8, 0.8, 1.0))))
+    push!(objs, Sphere(Vec3(0, -5001, 0), 5000, Material(Lambertian(), 0.03, nothing, RGB{Float32}(0.8, 0.8, 1.0))))
 
 	#left cube
-    cube_mat = Material(Lambertian(), 0.0, Texture("data/1.png", false), white)
+    cube_mat = Material(Lambertian(), 0.0, Texture("data/asdf.png", false), white)
     append!(objs, mesh_helper(cube_mesh(), cube_mat, 1.0, Vec3(0, 0, 0)))
 
 	#right cube
-    cube_mat = Material(Lambertian(), 0.0, Texture("data/1.png", false), white)
+    cube_mat = Material(Lambertian(), 0.0, Texture("data/wall.png", false), white)
     append!(objs, mesh_helper(cube_mesh(), cube_mat, 1.0, Vec3(2.005, 0, 2.005)))
     
     #companion cube
@@ -397,7 +397,7 @@ end
 
 
 
-
-scenes = [scene_1, scene_2, scene_3, scene_4, scene_5, scene_6, scene_7, scene_8, scene_9, portalScene1, portalScene2]
+scenes = [portalScene1, portalScene2]
+#scenes = [scene_1, scene_2, scene_3, scene_4, scene_5, scene_6, scene_7, scene_8, scene_9, portalScene1, portalScene2]
 
 end # module TestScenes
