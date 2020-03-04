@@ -167,20 +167,6 @@ end
 
 # Main loop:
 function main(scene, camera, height, width, outfile)
-
-    # get the requested scene and camera
-
-   # if scene == 10
-#	scene = TestScenes.portalScene2(height, width)[1]
-    #    camera = TestScenes.portalScene2(height, width)[2]
-    #elseif scene == 11
-    #    scene = TestScenes.artifact_myersdj(height, width)[1]
-    #    camera = TestScenes.artifact_myersdj(height, width)[2]
-   # else
-    	#scene = TestScenes.get_scene(scene, height, width)
-     #   camera = TestScenes.get_camera(camera, height, width)
-    #end
-
    if scene == 1
 	scene = TestScenes.portalScene1(height, width)[1]
         camera = TestScenes.portalScene1(height, width)[2]
@@ -188,9 +174,6 @@ function main(scene, camera, height, width, outfile)
 	scene = TestScenes.portalScene2(height, width)[1]
         camera = TestScenes.portalScene2(height, width)[2]
    end
-
-
-
 
     
     #get objects
