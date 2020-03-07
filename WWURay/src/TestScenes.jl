@@ -7,6 +7,7 @@ using ..Materials
 using ..Lights
 using ..OBJMeshes
 using ..Cameras
+using LinearAlgebra
 
 # helpful things:
 make_diffuse(color) = Material(Lambertian(), 0.0, nothing, color)
@@ -153,15 +154,38 @@ end
 """ Take the OBJMesh mesh and return an array of Triangles from the mesh
 with the given material, after scaling the mesh positions by scale and moving
 them by translation """
-function mesh_helper(mesh, material, scale=1.0, translation=Vec3(0,0,0))
-
+function mesh_helper(mesh, material, scale=1.0, translation=Vec4(0,0,0,0), rotAx=Vec3(1,0,0), angle=0)
+	rot = rotate(angle, rotAx[1], rotAx[2], rotAx[3])
     for i in 1:length(mesh.positions)
-        mesh.positions[i] = mesh.positions[i] * scale + translation
+        j = rot*Vec4(mesh.positions[i][1], mesh.positions[i][2], mesh.positions[i][3],1)  * scale + translation
+        mesh.positions[i] = Vec3(j[1], j[2], j[3])
     end
 
     create_triangles(mesh, material)
 end
 
+function rotate(a, x, y, z)
+    m = Matrix{Float64}(I,4,4)
+	ct = cos(a * pi / 180.0);
+    st = sin(a * pi / 180.0);
+    mag = sqrt(x^2 + y^2 + z^2);
+    x = x / mag;
+    y = y / mag;
+    z = z / mag;
+
+    m[1] = ct + x*x*(1-ct);
+    m[2] = x*y*(1-ct) - z*st;
+    m[3] = x*z*(1-ct) + y*st;
+
+    m[5] = y*x*(1-ct)+z*st;
+    m[6] = ct + y*y*(1-ct);
+    m[7] = y*z*(1-ct)-x*st;
+
+    m[9] = z*x*(1-ct)-y*st;
+    m[10] = z*y*(1-ct)+x*st;
+    m[11] = ct + z*z*(1-ct);
+    return m
+end
 
 
 
@@ -285,32 +309,6 @@ function artifact_shinm(img_height, img_width)
 end
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 function portalScene1(img_height, img_width)
 
     bg = black
@@ -323,13 +321,13 @@ function portalScene1(img_height, img_width)
 
 	#central cube
     cube_mat = Material(Lambertian(), 0.0, Texture("data/wall.png", false), white)
-    append!(objs, mesh_helper(cube_mesh(), cube_mat, 1.5, Vec3(0, 0, 0)))
+    append!(objs, mesh_helper(cube_mesh(), cube_mat, 1.5, Vec4(0, 0, 0,1)))
     
     #bunny location
     # add a bunny:
     bunny_mat = Material(Lambertian(), 0.02, nothing, RGB{Float32}(0.6, 0.5, 0.5))
     bunny = read_obj("data/bunny.obj")
-    append!(objs, mesh_helper(bunny, bunny_mat, 1.0, Vec3(4, 0, 0)))
+    append!(objs, mesh_helper(bunny, bunny_mat, 1.0, Vec4(4, 0, 0,1), Vec3(0,0,1), 90))
     
     
     #background behind bunny
@@ -361,20 +359,20 @@ function portalScene2(img_height, img_width)
 
 	#left cube
     cube_mat = Material(Lambertian(), 0.0, Texture("data/wall.png", false), white)
-    append!(objs, mesh_helper(cube_mesh(), cube_mat, 1.0, Vec3(0, 0, 0)))
+    append!(objs, mesh_helper(cube_mesh(), cube_mat, 1.0, Vec4(0, 0, 0,1)))
 
 	#right cube
     cube_mat = Material(Lambertian(), 0.0, Texture("data/wall.png", false), white)
-    append!(objs, mesh_helper(cube_mesh(), cube_mat, 1.0, Vec3(2.005, 0, 2.005)))
+    append!(objs, mesh_helper(cube_mesh(), cube_mat, 1.0, Vec4(2.005, 0, 2.005,1)))
 
 	#left portal
     portal_mat = Material(Lambertian(), 0.8,  nothing, RGB{Float32}(0.9, 0.01, 0.01))
     portal = read_obj("data/portal.obj")
-    append!(objs, mesh_helper(portal_mesh(2,2), portal_mat, 0.5, Vec3(0, 0, 0.52)))
+    append!(objs, mesh_helper(portal_mesh(2,1), portal_mat, 0.5, Vec4(0, 0, 0.52,1), Vec3(0,0,1), 90))
     
     #companion cube
     cube_mat = Material(Lambertian(), 0.0, Texture("data/companionCube.png", false), white)
-    append!(objs, mesh_helper(cube_mesh(), cube_mat, 0.25, Vec3(0, -0.75, 2)))
+    append!(objs, mesh_helper(cube_mesh(), cube_mat, 0.25, Vec4(0, -0.75, 2,1), Vec3(1,0,0), 0))
     
     lights = [ 
                DirectionalLight(0.8, Vec3(-0.4,0.4,0.4)),
@@ -385,17 +383,6 @@ function portalScene2(img_height, img_width)
 
 
 end
-
-
-
-
-
-
-
-
-
-
-
 
 
 
