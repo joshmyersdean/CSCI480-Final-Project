@@ -1,6 +1,6 @@
 module Scenes
 
-export HitRecord, Sphere, Scene, TriangleMesh, ray_intersect, create_triangles
+export HitRecord, Sphere, Scene, TriangleMesh, ray_intersect, create_triangles. Portal
 #export has_uvs, has_normals, get_vertex, get_uv, get_normal
 
 using LinearAlgebra

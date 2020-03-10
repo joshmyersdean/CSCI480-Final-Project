@@ -367,12 +367,16 @@ function portalScene2(img_height, img_width)
 
 	#left portal
     portal_mat = Material(Lambertian(), 0.8,  nothing, RGB{Float32}(0.9, 0.01, 0.01))
-    portal = read_obj("data/portal.obj")
     append!(objs, mesh_helper(portal_mesh(2,1), portal_mat, 0.5, Vec4(0, 0, 0.52,1), Vec3(0,0,1), 90))
     
     #companion cube
     cube_mat = Material(Lambertian(), 0.0, Texture("data/companionCube.png", false), white)
     append!(objs, mesh_helper(cube_mesh(), cube_mat, 0.25, Vec4(0, -0.75, 2,1), Vec3(1,0,0), 0))
+
+    # right portal
+    portal_mat = Material(Lambertian(), 0.8,  nothing, RGB{Float32}(0.9, 0.01, 0.01))
+    append!(objs, mesh_helper(portal_mesh(2,1), portal_mat, 0.5, Vec4(1.3, -.2, 2.2,1), Vec3(0,1,0), 90))
+
     
     lights = [ 
                DirectionalLight(0.8, Vec3(-0.4,0.4,0.4)),
