@@ -41,10 +41,6 @@ function camera_portal2(img_height, img_width)
 end
 
 
-
-
-
-
 cameras = [camera_1, camera_portal1, camera_portal2]
 
 function get_camera(i, img_height, img_width)
@@ -376,6 +372,7 @@ function portalScene2(img_height, img_width)
     # right portal
     portal_mat = Material(Lambertian(), 0.8,  nothing, RGB{Float32}(0.9, 0.01, 0.01))
     append!(objs, mesh_helper(portal_mesh(2,1), portal_mat, 0.5, Vec4(1.3, -.2, 2.2,1), Vec3(0,1,0), 90))
+    push!(objs, Portal(Vec3(0,0,0), 50, 50, portal_mat))
 
     
     lights = [ 
