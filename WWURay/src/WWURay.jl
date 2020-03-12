@@ -173,6 +173,10 @@ function main(scene, camera, height, width, outfile)
    elseif scene == 2
 	scene = TestScenes.portalScene2(height, width)[1]
         camera = TestScenes.portalScene2(height, width)[2]
+   elseif scene == 3
+	scene = TestScenes.portalScene3(height, width)[1]
+        camera = TestScenes.portalScene3(height, width)[2]
+
    end
 
     
