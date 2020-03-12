@@ -150,8 +150,11 @@ end
 """ Take the OBJMesh mesh and return an array of Triangles from the mesh
 with the given material, after scaling the mesh positions by scale and moving
 them by translation """
-function mesh_helper(mesh, material, scale=1.0, translation=Vec4(0,0,0,0), rotAx=Vec3(1,0,0), angle=0)
-	rot = rotate(angle, rotAx[1], rotAx[2], rotAx[3])
+function mesh_helper(mesh, material, scale=1.0, translation=Vec4(0,0,0,0), rotAx=[Vec3(1,0,0)], angle=[0])
+    rot = rotate(angle[1], rotAx[1][1], rotAx[1][2], rotAx[1][3])
+    for i in 2:length(rotAx)
+        rot = rotate(angle[i], rotAx[i][1], rotAx[i][2], rotAx[i][3]) * rot
+    end
     for i in 1:length(mesh.positions)
         j = rot*Vec4(mesh.positions[i][1], mesh.positions[i][2], mesh.positions[i][3],1)  * scale + translation
         mesh.positions[i] = Vec3(j[1], j[2], j[3])
@@ -349,6 +352,8 @@ function portalScene2(img_height, img_width)
 
     objs = []
 
+    yes = []
+
 
 	#make a the ground
     push!(objs, Sphere(Vec3(0, -5001, 0), 5000, Material(Lambertian(), 0.03, nothing, RGB{Float32}(0.8, 0.8, 1.0))))
@@ -363,24 +368,23 @@ function portalScene2(img_height, img_width)
 
 	#left portal
     portal_mat = Material(Lambertian(), 0.8,  nothing, RGB{Float32}(0.9, 0.01, 0.01))
-    append!(objs, mesh_helper(portal_mesh(2,1), portal_mat, 0.5, Vec4(0, 0, 0.52,1), Vec3(0,0,1), 90))
+    append!(objs, mesh_helper(portal_mesh(2,1), portal_mat, 0.5, Vec4(0, 0, 0.52,1), [Vec3(0,0,1)], [90]))
     
     #companion cube
-    cube_mat = Material(Lambertian(), 0.0, Texture("data/companionCube.png", false), white)
-    append!(objs, mesh_helper(cube_mesh(), cube_mat, 0.25, Vec4(0, -0.75, 2,1), Vec3(1,0,0), 0))
+    cube_mat = Material(Lambertian(), 0.0, nothing, white)
+    append!(objs, mesh_helper(cube_mesh(), cube_mat, 0.25, Vec4(0, -0.5, 2,1), [Vec3(0,0,1),Vec3(1,0,0)], [90,90]))
+    push!(objs, Portal(Vec3(0,1,0),2,1, cube_mat))
 
     # right portal
     portal_mat = Material(Lambertian(), 0.8,  nothing, RGB{Float32}(0.9, 0.01, 0.01))
-    append!(objs, mesh_helper(portal_mesh(2,1), portal_mat, 0.5, Vec4(1.3, -.2, 2.2,1), Vec3(0,1,0), 90))
-    push!(objs, Portal(Vec3(0,0,0), 50, 50, portal_mat))
-
+    append!(objs, mesh_helper(portal_mesh(2,1), portal_mat, 0.5, Vec4(1.3, 0, 2.2,1), [Vec3(0,1,0),Vec3(1,0,0)], [90,90]))
     
     lights = [ 
                DirectionalLight(0.8, Vec3(-0.4,0.4,0.4)),
                PointLight(0.3, Vec3(-1,5,0)) ]
 
 
-   return (Scene(bg, objs, lights), camera_portal2(img_height, img_width))
+   return (Scene(bg, objs, lights, yes), camera_portal2(img_height, img_width))
 
 
 end
