@@ -166,35 +166,69 @@ function is_shadowed(scene, light::PointLight, point::Vec3)
 end
 
 # Main loop:
-function main(scene, camera, height, width, outfile)
+function main(scene, camera, height, width, out)
    if scene == 1
 	scene = TestScenes.portalScene1(height, width)[1]
         camera = TestScenes.portalScene1(height, width)[2]
-   elseif scene == 2
+        getImages(scene, camera, height, width, out, 1, 0)
+    elseif scene == 2
 	scene = TestScenes.portalScene2(height, width)[1]
         camera = TestScenes.portalScene2(height, width)[2]
+        getImages(scene, camera, height, width, out, 1, -1)
+    elseif scene == 3
+	    scene = TestScenes.portalScene3(height, width)[1]
+        camera = TestScenes.portalScene3(height, width)[2]
+        getImages(scene, camera, height, width, out, 1, 0)
+        
    end
-
-    
-    #get objects
-    objs = scene.objects
-    # Create a blank canvas to store the image:
-    canvas = zeros(RGB{Float32}, height, width)
-
-    # for each pixel iterate over each object
-    # color the canavs accordingly 
-    for i = 1:height
-        for j = 1:width
-            ray:: Ray = Cameras.pixel_to_ray(camera, i, j)
-            color = traceray(scene, ray, 1, Inf, 8)
-            canvas[i,j] = color
-        end
-    end
-
-    # clamp canvas to valid range:
-    clamp01!(canvas)
-    save(File(format"PNG", outfile), colorview(RGB, canvas))
 end
 
-end # module WWURay
 
+function getImages(scene, camera, height, width, out, amountx, amountz) 
+
+    RANGLE = 45         # Rotate angle size
+    NUMS = 60           # Number of images
+    
+    for idx = 1:NUMS
+    
+        # change camera
+        T = [
+            1.0 0.0 0.0 inv(tan(RANGLE/NUMS))/30 * amountx;
+            0.0 1.0 0.0 0.0;
+            0.0 0.0 1.0 inv(tan(RANGLE/NUMS))/30 * amountz;
+            0.0 0.0 0.0 1.0
+        ] 
+        
+        R = TestScenes.rotate(RANGLE/NUMS, 0, 1, 0);
+        newcam = T * Vec4(camera.eye[1], camera.eye[2], camera.eye[3], 1)
+        camera.eye = Vec3(newcam[1], newcam[2], newcam[3])
+
+
+        #get objects
+        objs = scene.objects
+        # Create a blank canvas to store the image:
+        canvas = zeros(RGB{Float32}, height, width)
+
+        # for each pixel iterate over each object
+        # color the canavs accordingly 
+        for i = 1:height
+            for j = 1:width
+                ray:: Ray = Cameras.pixel_to_ray(camera, i, j)
+                color = traceray(scene, ray, 1, Inf, 8)
+                canvas[i,j] = color
+            end
+        end
+
+        # clamp canvas to valid range:
+        clamp01!(canvas)
+        
+        outfolder = string("video/", out)
+        outfname = string(idx, ".png")
+        save(File(format"PNG", string(outfolder, outfname)), colorview(RGB, canvas))
+
+    end # end of idx loop    
+
+end
+
+
+end # module WWURay
