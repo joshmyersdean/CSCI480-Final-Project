@@ -22,21 +22,17 @@ function camera_1(img_height, img_width)
     CanonicalCamera(img_height, img_width)
 end
 
-
-
 function camera_portal1(img_height, img_width)
-    eye = Vec3(-3.5, 0.5, 5)
-    view = Vec3(-2.5, 0.5, 0) - eye
+    eye = Vec3(-1.5, 0.5, 5)
+    view = Vec3(-0.5, 0.5, 0) - eye
     up = Vec3(0, 1, 0)
     focal = 1.0
     Cameras.PerspectiveCamera(eye, view, up, focal, img_height, img_width)
 end
 
 
-
-
 function camera_portal2(img_height, img_width)
-    eye = Vec3(-6, 0.5, 8)
+    eye = Vec3(-3.5, 0.5, 5.5)
     view = Vec3(0, 0, 2) - eye
     up = Vec3(0, 1, 0)
     focal = 1.0
@@ -44,21 +40,13 @@ function camera_portal2(img_height, img_width)
 end
 
 
-
-
-
-
 function camera_portal3(img_height, img_width)
-	eye = Vec3(-0,0.5,5)
-	view = Vec3(-0.2,0.45,3) - eye
+	eye = Vec3(-1,0.5,5)
+	view = Vec3(-1.2,0.45,3) - eye
 	up = Vec3(0,1,0)
 	focal = 1.0
 	Cameras.PerspectiveCamera(eye, view, up, focal, img_height, img_width)
 end
-
-
-
-
 
 
 cameras = [camera_1, camera_portal1, camera_portal2, camera_portal3]
