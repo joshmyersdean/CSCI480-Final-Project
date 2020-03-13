@@ -25,15 +25,18 @@ end
 
 
 function camera_portal1(img_height, img_width)
-    eye = Vec3(0, 3, 100)
-    view = Vec3(0, 0, 0) - eye
+    eye = Vec3(-3.5, 0.5, 5)
+    view = Vec3(-2.5, 0.5, 0) - eye
     up = Vec3(0, 1, 0)
-    focal = 8.0
+    focal = 1.0
     Cameras.PerspectiveCamera(eye, view, up, focal, img_height, img_width)
 end
 
+
+
+
 function camera_portal2(img_height, img_width)
-    eye = Vec3(-2, 0.5, 4)
+    eye = Vec3(-6, 0.5, 8)
     view = Vec3(0, 0, 2) - eye
     up = Vec3(0, 1, 0)
     focal = 1.0
@@ -41,13 +44,21 @@ function camera_portal2(img_height, img_width)
 end
 
 
+
+
+
+
 function camera_portal3(img_height, img_width)
-	eye = Vec3(0,0.5,9)
-	view = Vec3(0,0.5,0) - eye
+	eye = Vec3(-0,0.5,5)
+	view = Vec3(-0.2,0.45,3) - eye
 	up = Vec3(0,1,0)
 	focal = 1.0
 	Cameras.PerspectiveCamera(eye, view, up, focal, img_height, img_width)
 end
+
+
+
+
 
 
 cameras = [camera_1, camera_portal1, camera_portal2, camera_portal3]
@@ -329,22 +340,43 @@ function portalScene1(img_height, img_width)
 
 	#central cube
     cube_mat = Material(Lambertian(), 0.0, Texture("data/wall.png", false), white)
-    append!(objs, mesh_helper(cube_mesh(), cube_mat, 1.5, Vec4(0, 0, 0,1)))
+    append!(objs, mesh_helper(cube_mesh(), cube_mat, 1.0, Vec4(0, 0, 0,1)))
     
     #bunny location
     # add a bunny:
     bunny_mat = Material(Lambertian(), 0.02, nothing, RGB{Float32}(0.6, 0.5, 0.5))
     bunny = read_obj("data/bunny.obj")
-    append!(objs, mesh_helper(bunny, bunny_mat, 1.0, Vec4(4, 0, 0,1)))
+    append!(objs, mesh_helper(bunny, bunny_mat, 1.0, Vec4(5, 0, 0,1), [Vec3(0,1,0)], [90]))
     
     
     #background behind bunny
-    sphere_material = Material(Lambertian(), 0.0, Texture("data/earth.png", false), nothing)
-    push!(objs, Sphere(Vec3(6.5, 0, 0), 1, sphere_material))
+    cube_mat = Material(Lambertian(), 0.0, Texture("data/warningAll.jpg", false), white)
+    append!(objs, mesh_helper(cube_mesh(), cube_mat, 2.0, Vec4(7.5, 0.5, 0,1), [Vec3(0,1,0)], [90]))
+
+
+    #front portal background
+    portal_mat = Material(Lambertian(), 0.0,  nothing, RGB{Float32}(0.99215686274, 0.4, 0.0))
+    append!(objs, mesh_helper(portal_background_mesh(2,1), portal_mat, 0.49, Vec4(0,0, 0.52,1), [Vec3(0,0,1)], [90]))
+
+    #front portal
+    portal_mat = Material(Lambertian(), 1.0,  nothing, RGB{Float32}(0.0, 0.0, 0.0))
+    append!(objs, mesh_helper(portal_mesh(2,1), portal_mat, 0.47, Vec4(0, 0.015, 0.545,1), [Vec3(0,0,1)], [90]))
+
+
+    #right portal background
+    portal_mat = Material(Lambertian(), 0.0,  nothing, RGB{Float32}(0.0, 0.47058823529, 1))
+    append!(objs, mesh_helper(portal_background_mesh(2,1), portal_mat, 0.49, Vec4(0.52, 0, 0,1), [Vec3(0,1,0),Vec3(1,0,0)], [-90,90]))
+
+    #right portal
+    portal_mat = Material(Lambertian(), 1.0,  nothing, RGB{Float32}(0.0, 0.0, 0.0))
+    append!(objs, mesh_helper(portal_mesh(2,1), portal_mat, 0.47, Vec4(0.545, 0.015, 0,1), [Vec3(0,1,0),Vec3(1,0,0)], [-90,90]))
+
+
     
     
-    lights = [ DirectionalLight(0.4, Vec3(0,1,0)),
-               DirectionalLight(0.8, Vec3(0.4,0.4,1)) ]
+    lights = [ DirectionalLight(0.8, Vec3(-1, 0.4, 0.8)),
+               PointLight(0.9, Vec3(2, 8, 0)),
+	       PointLight(0.9, Vec3(3, 3, 3)) ]
 
 
    return (Scene(bg, objs, lights), camera_portal1(img_height, img_width))
@@ -372,19 +404,29 @@ function portalScene2(img_height, img_width)
     cube_mat = Material(Lambertian(), 0.0, Texture("data/wall.png", false), white)
     append!(objs, mesh_helper(cube_mesh(), cube_mat, 1.0, Vec4(2.005, 0, 2.005,1)))
 
+
+    #left portal background
+    portal_mat = Material(Lambertian(), 0.0,  nothing, RGB{Float32}(0.99215686274, 0.4, 0.0))
+	append!(objs, mesh_helper(portal_background_mesh(2,1), portal_mat, 0.49, Vec4(0, 0, 0.515,1), [Vec3(0,0,1)], [90]))
+
     #left portal
-    portal_mat = Material(Lambertian(), 0.8,  nothing, RGB{Float32}(0.9, 0.01, 0.01))
-    append!(objs, mesh_helper(portal_mesh(2,1), portal_mat, 0.49, Vec4(0, 0, 0.52,1), [Vec3(0,0,1)], [90]))
+    portal_mat = Material(Lambertian(), 1.0,  nothing, RGB{Float32}(0.0, 0.0, 0.0))
+    append!(objs, mesh_helper(portal_mesh(2,1), portal_mat, 0.47, Vec4(0, 0.015, 0.536,1), [Vec3(0,0,1)], [90]))
     
 
     #companion cube
     cube_mat = Material(Lambertian(), 0.0, Texture("data/companionCube.png", false), white)
-    append!(objs, mesh_helper(cube_mesh(), cube_mat, 0.25, Vec4(0, -0.75, 2,1), [Vec3(0,1,0)], [156]))
+    append!(objs, mesh_helper(cube_mesh(), cube_mat, 0.25, Vec4(0, -0.75, 2,1), [Vec3(0,1,0)], [0]))
 
+
+
+    # right portal background
+    portal_mat = Material(Lambertian(), 0.0,  nothing, RGB{Float32}(0.0, 0.47058823529, 1))
+    append!(objs, mesh_helper(portal_background_mesh(2,1), portal_mat, 0.49, Vec4(1.49, 0, 2.0,1), [Vec3(0,1,0),Vec3(1,0,0)], [90,90]))
 
     # right portal
-    portal_mat = Material(Lambertian(), 0.8,  nothing, RGB{Float32}(0.01, 0.01, 0.9))
-    append!(objs, mesh_helper(portal_mesh(2,1), portal_mat, 0.49, Vec4(1.3, 0, 2.1,1), [Vec3(0,1,0),Vec3(1,0,0)], [90,90]))
+    portal_mat = Material(Lambertian(), 1.0,  nothing, RGB{Float32}(0.0, 0.0, 0.0))
+    append!(objs, mesh_helper(portal_mesh(2,1), portal_mat, 0.47, Vec4(1.46, 0.015, 2.0,1), [Vec3(0,1,0),Vec3(1,0,0)], [90,90]))
     
     lights = [ 
                DirectionalLight(0.8, Vec3(-1,1,1)),
@@ -403,11 +445,9 @@ function portalScene3(img_height, img_width)
     bg = black
 
     objs = []
-    
-	#make the ground
+   
+    #make the ground
     push!(objs, Sphere(Vec3(0, -5001, 0), 5000, Material(Lambertian(), 0.03, nothing, RGB{Float32}(0.8, 0.8, 1.0))))
-    
-    
     
     
     #left cube
@@ -417,31 +457,40 @@ function portalScene3(img_height, img_width)
         
     #right cube
     cube_mat = Material(Lambertian(), 0.0, Texture("data/wall.png", false), white)
-    append!(objs, mesh_helper(cube_mesh(), cube_mat, 1.0, Vec4(2.5, 0, 0, 1)))
+    append!(objs, mesh_helper(cube_mesh(), cube_mat, 1.0, Vec4(0, 0, 6, 1)))
 
-
-
-	#left portal
-    portal_mat = Material(Lambertian(), 0.8,  nothing, RGB{Float32}(0.9, 0.01, 0.01))
-    append!(objs, mesh_helper(portal_mesh(1,2), portal_mat, 0.5, Vec4(0, 0, 0.52,1)))
-
-
-	#right portal
-    portal_mat = Material(Lambertian(), 0.8,  nothing, RGB{Float32}(0.01, 0.01, 0.9))
-    append!(objs, mesh_helper(portal_mesh(1,2), portal_mat, 0.5, Vec4(2.5, 0, 0.52,1)))
-    
-    
     
     #add a bunny
-    bunny_mat = Material(Lambertian(), 0.0, nothing, RGB{Float32}(0.3, 0.5, 0.2))
+    bunny_mat = Material(Lambertian(), 0.0, nothing, RGB{Float32}(0.8, 0.8, 0.8))
     bunny = read_obj("data/bunny.obj")
-    append!(objs, mesh_helper(bunny, bunny_mat, 0.7, Vec4(2.5, -0.3, 3.5, 1)))
+    append!(objs, mesh_helper(bunny, bunny_mat, 0.5, Vec4(0, -0.5, 3, 1)))
 
+
+
+
+    #left portal background
+    portal_mat = Material(Lambertian(), 0.0,  nothing, RGB{Float32}(0.0, 0.47058823529, 1))
+    append!(objs, mesh_helper(portal_background_mesh(2,1), portal_mat, 0.49, Vec4(0, 0, 0.52,1), [Vec3(0,0,1)], [90]))
+
+    #left portal
+    portal_mat = Material(Lambertian(), 1.0,  nothing, RGB{Float32}(0.0, 0.0, 0.0))
+    append!(objs, mesh_helper(portal_mesh(2,1), portal_mat, 0.47, Vec4(0, 0.015, 0.558,1), [Vec3(0,0,1)], [90]))
+
+
+
+    # right portal background
+    portal_mat = Material(Lambertian(), 0.0,  nothing, RGB{Float32}(0.99215686274, 0.4, 0.0))
+    append!(objs, mesh_helper(portal_background_mesh(2,1), portal_mat, 0.49, Vec4(0, 0, 5.48,1), [Vec3(0,0,1), Vec3(0,1,0)], [90, 180]))
+
+
+    #right portal
+    portal_mat = Material(Lambertian(), 1.0,  nothing, RGB{Float32}(0.0, 0.0, 0.0))
+    append!(objs, mesh_helper(portal_mesh(2,1), portal_mat, 0.47, Vec4(0, 0.015, 5.455,1), [Vec3(0,0,1), Vec3(0,1,0)], [90, 180]))
 
     
     lights = [ 
-   DirectionalLight(1.0, Vec3(1,1,1)),
-               PointLight(0.9, Vec3(0,5,7)) ]
+        PointLight(1.0, Vec3(0,3,3)),
+	DirectionalLight(1.0, Vec3(-1, 0.5, 0)) ]
 
 
    return (Scene(bg, objs, lights), camera_portal3(img_height, img_width))

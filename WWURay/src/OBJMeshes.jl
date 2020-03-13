@@ -1,7 +1,7 @@
 module OBJMeshes
 
 export read_obj, write_obj, tri_vertex_str
-export cube_mesh, cylinder_mesh, sphere_mesh, estimate_normals, portal_mesh
+export cube_mesh, cylinder_mesh, sphere_mesh, estimate_normals, portal_mesh, portal_background_mesh
 export OBJTriangle, OBJMesh
 
 using FileIO
@@ -160,31 +160,80 @@ function cube_mesh()
     push!(uvs, Vec2(0, 0)) # BL
     push!(uvs, Vec2(1, 0)) # BR
 
+
+    #by removing pre-made normals from our objects, we're able to rotate them and calculate new normals (gets rid of black surfaces!)
+
     # normals:
-    push!(normals, Vec3( 1, 0, 0)) # R
-    push!(normals, Vec3(-1, 0, 0)) # L
-    push!(normals, Vec3( 0, 1, 0)) # U
-    push!(normals, Vec3( 0,-1, 0)) # D
-    push!(normals, Vec3( 0, 0, 1)) # C
-    push!(normals, Vec3( 0, 0,-1)) # F
+    #push!(normals, Vec3( 1, 0, 0)) # R
+    #push!(normals, Vec3(-1, 0, 0)) # L
+    #push!(normals, Vec3( 0, 1, 0)) # U
+    #push!(normals, Vec3( 0,-1, 0)) # D
+    #push!(normals, Vec3( 0, 0, 1)) # C
+    #push!(normals, Vec3( 0, 0,-1)) # F
 
     # 8 faces, 2 triangles each
-    push!(triangles, OBJTriangle([1,2,3], [1,2,3], [4,4,4])) # bottom face 1
-    push!(triangles, OBJTriangle([1,3,4], [1,3,4], [4,4,4])) # bottom face 2
-    push!(triangles, OBJTriangle([1,5,6], [4,1,2], [1,1,1])) # right face 1
-    push!(triangles, OBJTriangle([1,6,2], [4,2,3], [1,1,1])) # right face 2
-    push!(triangles, OBJTriangle([2,6,7], [4,1,2], [5,5,5])) # far face 1
-    push!(triangles, OBJTriangle([2,7,3], [4,2,3], [5,5,5])) # far face 2
-    push!(triangles, OBJTriangle([3,7,8], [2,3,4], [2,2,2])) # left face 1
-    push!(triangles, OBJTriangle([3,8,4], [2,4,1], [2,2,2])) # left face 2
-    push!(triangles, OBJTriangle([4,8,5], [2,3,4], [6,6,6])) # far face 1
-    push!(triangles, OBJTriangle([4,5,1], [2,4,1], [6,6,6])) # far face 2
-    push!(triangles, OBJTriangle([5,8,7], [1,2,3], [3,3,3])) # top face 1
-    push!(triangles, OBJTriangle([5,7,6], [1,3,4], [3,3,3])) # top face 2
+    push!(triangles, OBJTriangle([1,2,3], [1,2,3], [])) # bottom face 1
+    push!(triangles, OBJTriangle([1,3,4], [1,3,4], [])) # bottom face 2
+    push!(triangles, OBJTriangle([1,5,6], [4,1,2], [])) # right face 1
+    push!(triangles, OBJTriangle([1,6,2], [4,2,3], [])) # right face 2
+    push!(triangles, OBJTriangle([2,6,7], [4,1,2], [])) # far face 1
+    push!(triangles, OBJTriangle([2,7,3], [4,2,3], [])) # far face 2
+    push!(triangles, OBJTriangle([3,7,8], [2,3,4], [])) # left face 1
+    push!(triangles, OBJTriangle([3,8,4], [2,4,1], [])) # left face 2
+    push!(triangles, OBJTriangle([4,8,5], [2,3,4], [])) # far face 1
+    push!(triangles, OBJTriangle([4,5,1], [2,4,1], [])) # far face 2
+    push!(triangles, OBJTriangle([5,8,7], [1,2,3], [])) # top face 1
+    push!(triangles, OBJTriangle([5,7,6], [1,3,4], [])) # top face 2
 
     # julia automatically returns the last value in the function:
     OBJMesh(positions, uvs, normals, triangles)
 
+end
+
+
+function portal_mesh(x, y)
+
+    positions = []
+    uvs = []
+    normals = []
+    triangles = [] 
+    push!(positions, Vec3(0,0,1)) # top of cap
+    #push!(normals, Vec3(0,0,1))  
+    n = 20
+    for i = 1:n+1
+        ratio = i/n  
+        theta = 2*pi*ratio
+        push!(positions, Vec3(-sin(theta)*x, -cos(theta)*y, 1))
+        #push!(normals, Vec3(-sin(theta),  -cos(theta), 1))
+    end
+	length_pos = length(positions)
+     for i=1:length_pos-1
+       push!(triangles, OBJTriangle([i, 1,i+1],[i+length_pos,1,i+length_pos],[]))
+     end
+     OBJMesh(positions, uvs, normals, triangles)
+
+end
+
+
+
+#a copy of the portal mesh function that (hopefully) will be recognized as not-a-portal
+function portal_background_mesh(x, y)
+    positions = []
+    uvs = []
+    normals = []
+    triangles = [] 
+    push!(positions, Vec3(0,0,1)) # top of cap
+    n = 20
+    for i = 1:n+1
+        ratio = i/n  
+        theta = 2*pi*ratio
+        push!(positions, Vec3(-sin(theta)*x, -cos(theta)*y, 1))
+    end
+	length_pos = length(positions)
+     for i=1:length_pos-1
+       push!(triangles, OBJTriangle([i, 1,i+1],[i+length_pos,1,i+length_pos],[]))
+     end
+     OBJMesh(positions, uvs, normals, triangles)
 end
 
 
@@ -194,38 +243,6 @@ height 2, centered at the origin. The logitudinal axis is aligned with y, and
 it is tesselated with n divisions arranged radially around the outer surface.
 The ends of the cylinder are disc-shaped caps parallel to the xz plane.
 """
-
-function portal_mesh(x, y)
-
-
-    positions = []
-    uvs = []
-    normals = []
-    triangles = [] 
-    push!(positions, Vec3(0,0,1)) # top of cap
-    push!(normals, Vec3(0,0,1))  
-    n = 20
-    for i = 1:n+1
-        ratio = i/n  
-        theta = 2*pi*ratio
-        push!(positions, Vec3(-sin(theta)*x, -cos(theta)*y, 1))
-        push!(normals, Vec3(-sin(theta),  -cos(theta), 1))
-    end
-	length_pos = length(positions)
-     for i=1:length_pos-1
-       push!(triangles, OBJTriangle([i, 1,i+1],[i+length_pos,1,i+length_pos],[1,1,1]))
-     end
-     OBJMesh(positions, uvs, normals, triangles)
-
-
-
-
-
-end
-
-
-
-
 function cylinder_mesh(divisionsU)
   positions = []
   uvs = []
