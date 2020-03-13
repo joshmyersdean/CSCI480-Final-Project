@@ -52,10 +52,7 @@ end
 
 
 struct Portal
-    center::Vec3
-    radiusX::Float64
-    radiusY::Float64
-    material::Material
+    mesh::Array{Any, 1}
 end
 
 """ Ray-sphere intersection. """

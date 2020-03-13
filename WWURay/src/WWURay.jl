@@ -37,8 +37,19 @@ import .TestScenes
 along a ray, constraining the search to values of t between tmin and tmax. """
 function closest_intersect(objects::Array{Any, 1}, ray::Ray, tmin, tmax)
     closestHit = nothing 
+    hit1 = nothing
+    hit2 = nothing
+    count = 0
     # various cases for error handling
     for i ∈ objects 
+        if typeof(i) == Scenes.Portal
+             if count == 0
+                 hit1 =  closest_intersect(i.mesh, ray, tmin, tmax)
+                 count += 1
+            else
+                hit2 = closest_intersect(i.mesh, ray, tmin, tmax)
+            end
+        end
         hit = Scenes.ray_intersect(ray, i)
         if isnothing(hit) && isnothing(closestHit)
             continue
@@ -61,6 +72,27 @@ function closest_intersect(objects::Array{Any, 1}, ray::Ray, tmin, tmax)
                 continue
             end
         end
+    end
+    if isnothing(hit1) && !isnothing(hit2)
+        hit1 = hit2
+    elseif !isnothing(hit1) && isnothing(hit2)
+        hit1 = hit1
+    elseif !isnothing(hit1) && !isnothing(hit2)
+        if hit1.t < hit2.t
+            hit1 = hit1
+        else
+            hit1 = hit2
+        end
+    end
+
+
+    if !isnothing(hit1) &&  !isnothing(closestHit)
+        if hit1.t < closestHit.t
+            closestHit = hit1
+        end
+    
+    elseif !isnothing(hit1) && isnothing(closestHit)
+        closestHit = hit1
     end
     return closestHit
 end
