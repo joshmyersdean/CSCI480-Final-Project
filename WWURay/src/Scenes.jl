@@ -51,9 +51,12 @@ struct Sphere
 end
 
 
-struct Portal
+mutable struct Portal
     mesh::Array{Any, 1}
+    center::Vec3
+    buddy::Union{Portal, Nothing}
 end
+
 
 """ Ray-sphere intersection. """
 function ray_intersect(ray::Ray, object::Sphere)
