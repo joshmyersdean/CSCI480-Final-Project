@@ -17,7 +17,7 @@
     <section>
         <h2>1. About Us</h2>
         <ul>
-            <li>Title: Portal</li>
+            <li>Title: Portal 3 - A raytracing approach</li>
             <li>Member: Josh Myers-Dean, Mina Shin, Ryan Wells</li>
             <li><a href="https://github.com/joshmyersdean/CSCI480-Final-Project">Github</a></li>
         </ul>
@@ -25,56 +25,59 @@
 
     <section>
         <h2>2. Summary</h2>
-        <p></p>
+        <p>
+         We started out this final project fairly ambitious; aiming to provide user control and specifications for portal objects. By our milestone we realized this would not be possible in the timeframe we had, as well as
+         the difficulty of actually implementing portals. Instead we decided at our milestone to animate scenes with portals present in them. While we were not able to achieve dynamic user interaction, we were able to successfully
+         animate a couple of scenes with the valve portal effect. This project presented more challenges than we had originally thought and there are fairly few resources on portal raytacing. Overall, we mostly hit our milestone goals and learned a lot during this project. Scenes 1 and 4 are fully functional with portal implementation and scenes 2 and 3 demonstrate portal like effects using standard machinary.
+        </p>
     </section>
 
     <section>
         <h2>3. Results</h2>
         <p></p>
         <div class="row">
-            <div class="col-md-4 mb-5">
-                <video controls>
-                    <source src="images/s2.mp4" type="video/mp4">
-                    Your browser does not support HTML5 video.
-                </video>
-                <div class="card-body">
-                    <h5 class="card-title">Scene1</h5>
-                    <p class="card-text">...</p>
-                </div>
+        <div>
+        <div class="card-body">
+            <h5 class="card-title">Scene 1</h5>
+            <p class="card-text">A basic setup of looking at a portal and seeing it shoot off to the side.</p>
+        </div>
+            <img src="../WWURay/results/scene1.gif" alt="scene 2 gif"/>
+        </div>
+            <div>
+            <div class="card-body">
+                <h5 class="card-title">Scene 2</h5>
+                    <p class="card-text">A scene inspired by the actual portal game.</p>
             </div>
-            <div class="col-md-4 mb-5">
-                <video controls>
-                    <source src="images/s2.mp4" type="video/mp4">
-                    Your browser does not support HTML5 video.
-                </video>
-                <div class="card-body">
-                    <h5 class="card-title">Scene2</h5>
-                    <p class="card-text">...</p>
-                </div>
+                <img src="../WWURay/results/scene2.gif" alt="scene 2 gif"/>
             </div>
-            <div class="col-md-4 mb-5">
-                <video controls>
-                    <source src="images/s2.mp4" type="video/mp4">
-                    Your browser does not support HTML5 video.
-                </video>
+            <div>
+            <div class="card-body">
+                <h5 class="card-title">Scene 3</h5>
+                <p class="card-text">An infinite hallway effect obtained using only mirrors</p>
+            </div>
+                    <img src="../WWURay/results/scene3.gif" alt="scene 3 gid"/>
+            </div>
+            <div>
                 <div class="card-body">
-                    <h5 class="card-title">Scene3</h5>
-                    <p class="card-text">...</p>
+                    <h5 class="card-title">Scene 4</h5>
+                    <p class="card-text">One of the Portal Scenes</p>
                 </div>
+                    <img src="../WWURay/results/scene4.gif" alt="scene4 gif"/>
             </div>
         </div>
-
     </section>
-
 
     <section>
         <h2>4. Instructions</h2>
         <p>Please refer to <a
-                href="https://github.com/joshmyersdean/CSCI480-Final-Project/blob/master/README.md">README.md</a></p>
+                href="https://github.com/joshmyersdean/CSCI480-Final-Project/blob/master/README.md">the README in the repository.</a></p>
     </section>
 
     <section>
         <h2>5. Coding guide</h2>
+        The meat of our code is based heavily on our raytracer from A2. Given that we created a new portal object mesh which lives in OBJMeshes.jl and a user is able to specify both the x and y radius. We then modified the test scenes such that each portal would have a wall to rest on as well as a an orange or blue background. Also in TestScenes.jl we implemented a way to rotate points that can be used in a the mesh_helper function, as well as standalone use - which we used to change the
+        camera position in order to generate an animation. In WWURay.jl we recalculated the mirror ray based on certain scenes. Note that we were unable to come up with a scalable way to render portals and did the math by hand to
+        compute these viewing rays. Also in WWURay lays the driver code to generate 60 images, as to achieve 60 fps on a video.  
     </section>
 </body>
 

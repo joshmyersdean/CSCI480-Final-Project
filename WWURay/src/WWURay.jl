@@ -1,7 +1,7 @@
 """ 
-Main module for CS480/580 A2 raytracer. Contains core raytracing algrithm,
-while referencing several other modules that encapsulate supporting
-functionality.
+CSCI 480 Final Project
+Authors: Josh Myers-Dean, Mina Shin, Ryan Wells
+Winter 2020
 """
 
 module WWURay
@@ -97,20 +97,17 @@ function traceray(scene::Scene, ray::Ray, tmin, tmax, rec_depth=1)
         return local_color
     end
     if scene.id == 1
-
-
-tpRay = Vec3(0.545, 0.0, -0.545) 
-
-
-#rotate mirror_ray's direction (90 degrees clockwise) without changing it's origin
-new_dir = Vec3(-ray_dir[3], -ray_dir[2], ray_dir[1])
+        tpRay = Vec3(0.545, 0.0, -0.545) 
+        #rotate mirror_ray's direction (90 degrees clockwise) without changing it's origin
+        new_dir = Vec3(-ray_dir[3], -ray_dir[2], ray_dir[1])
 
                   #new origin      new direction
-mirror_ray = Ray(point - tpRay, -normalize(new_dir))
-
-
-
-end
+        mirror_ray = Ray(point - tpRay, -normalize(new_dir))
+    elseif scene.id == 4
+            tpRay = Vec3(-2.5,0,0)
+            new_dir = Vec3(ray_dir[1], -ray_dir[2], -ray_dir[3])
+            mirror_ray = Ray(point - tpRay, -normalize(new_dir))
+    end
     reflected_color = traceray(scene, mirror_ray, 1e-8, Inf, rec_depth-1)
     return (local_color*(1-mirror_co))+(reflected_color*mirror_co)
         
@@ -194,17 +191,18 @@ function main(scene, height, width, out)
 	    scene = TestScenes.portalScene3(height, width)[1]
         camera = TestScenes.portalScene3(height, width)[2]
         getImages(scene, camera, height, width, out, 1, 0)   
+    elseif scene == 4 
+        scene = TestScenes.portalScene4(height, width)[1]
+        camera = TestScenes.portalScene4(height, width)[2]
+        getImages(scene, camera, height, width, out, 1, 0)   
    end
 end
 
-
+# gets 60 images with varying camera position
 function getImages(scene, camera, height, width, out, amountx, amountz) 
-
     RANGLE = 45         # Rotate angle size
     NUMS = 60           # Number of images
-    
     for idx = 1:NUMS
-    
         # change camera
         T = [
             1.0 0.0 0.0 inv(tan(RANGLE/NUMS))/30 * amountx;
@@ -241,30 +239,6 @@ function getImages(scene, camera, height, width, out, amountx, amountz)
         save(File(format"PNG", string(outfolder, outfname)), colorview(RGB, canvas))
 
     end # end of idx loop    
-end
-
-
-function writevideo(fname, imgstack::Array{<:Color,3};
-                    overwrite=true, fps=30::UInt, options=``)
-    ow = overwrite ? `-y` : `-n`
-    h, w, nframes = size(imgstack)
-
-    open(`ffmpeg
-            -loglevel warning
-            $ow
-            -f rawvideo
-            -pix_fmt rgb24
-            -s:v $(h)x$(w)
-            -r $fps
-            -i pipe:0
-            $options
-            -vf "transpose=0"
-            -pix_fmt yuv420p
-            $fname`, "w") do out
-        for i = 1:nframes
-            write(out, convert.(RGB{N0f8}, clamp01.(imgstack[:,:,i])))
-        end
-    end
 end
 
 end # module WWURay

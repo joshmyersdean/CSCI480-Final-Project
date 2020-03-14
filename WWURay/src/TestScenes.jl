@@ -23,8 +23,8 @@ function camera_1(img_height, img_width)
 end
 
 function camera_portal1(img_height, img_width)
-    eye = Vec3(-2.5, 0.25, 5)
-    view = Vec3(-1.5, 0.5, 0) - eye
+    eye = Vec3(-1.5, 0.25, 5)
+    view = Vec3(-0.5, 0.5, 0) - eye
     up = Vec3(0, 1, 0)
     focal = 1.0
     Cameras.PerspectiveCamera(eye, view, up, focal, img_height, img_width)
@@ -43,6 +43,13 @@ end
 function camera_portal3(img_height, img_width)
 	eye = Vec3(-1,0.5,5)
 	view = Vec3(-1.2,0.45,3) - eye
+	up = Vec3(0,1,0)
+	focal = 1.0
+	Cameras.PerspectiveCamera(eye, view, up, focal, img_height, img_width)
+end
+function camera_portal4(img_height, img_width)
+	eye = Vec3(0,0.5,9)
+	view = Vec3(0,0.5,0) - eye
 	up = Vec3(0,1,0)
 	focal = 1.0
 	Cameras.PerspectiveCamera(eye, view, up, focal, img_height, img_width)
@@ -277,8 +284,60 @@ function portalScene3(img_height, img_width)
 
 end
 
+function portalScene4(img_height, img_width)
+
+    bg = black
+
+    objs = []
+    
+	#make the ground
+    push!(objs, Sphere(Vec3(0, -5001, 0), 5000, Material(Lambertian(), 0.03, nothing, RGB{Float32}(0.8, 0.8, 1.0))))
+    
+    
+    
+    
+    #left cube
+    cube_mat = Material(Lambertian(), 0.0, Texture("data/wall.png", false), white)
+    append!(objs, mesh_helper(cube_mesh(), cube_mat, 1.0, Vec4(0, 0, 0, 1)))
+    
+        
+    #right cube
+    cube_mat = Material(Lambertian(), 0.0, Texture("data/wall.png", false), white)
+    append!(objs, mesh_helper(cube_mesh(), cube_mat, 1.0, Vec4(2.5, 0, 0, 1)))
 
 
-scenes = [portalScene1, portalScene2, portalScene3]
+
+	#left portal
+    portal_mat = Material(Lambertian(), 1.0,  nothing, RGB{Float32}(0.9, 0.01, 0.01))
+    append!(objs, mesh_helper(portal_mesh(1,2), portal_mat, 0.5, Vec4(0, 0, 0.52,1)))
+
+
+	#right portal
+    portal_mat = Material(Lambertian(), 1.0,  nothing, RGB{Float32}(0.01, 0.01, 0.9))
+    append!(objs, mesh_helper(portal_mesh(1,2), portal_mat, 0.5, Vec4(2.5, 0, 0.52,1)))
+    
+    
+    
+    #add a bunny
+    bunny_mat = Material(Lambertian(), 0.0, nothing, RGB{Float32}(0.3, 0.5, 0.2))
+    bunny = read_obj("data/bunny.obj")
+    append!(objs, mesh_helper(bunny, bunny_mat, 0.7, Vec4(2.5, -0.3, 3.5, 1)))
+
+
+    
+    lights = [ 
+   DirectionalLight(1.0, Vec3(1,1,1)),
+               PointLight(0.9, Vec3(0,5,7)) ]
+
+
+   return (Scene(4,bg, objs, lights), camera_portal4(img_height, img_width))
+
+
+end
+
+
+
+
+scenes = [portalScene1, portalScene2, portalScene3, portalScene4]
 
 end # module TestScenes
