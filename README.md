@@ -66,7 +66,7 @@ $ ls
 
 
 ## Creating Video From Scene Images
-To create a video, we are using external multimedia framework called FFmpeg. More information is [here](https://www.ffmpeg.org/). For our default scene, you can run the below command.
+To create a video, we are using external multimedia framework called FFmpeg. More information is [here](https://hamelot.io/visualization/using-ffmpeg-to-convert-a-set-of-images-into-a-video/). For our default scene, you can run the below command.
 
 ```
 $ ffmpeg -r 60 -f image2 -s 1920x1080 -i s2_%d.png -vcodec libx264 -crf 25  -pix_fmt yuv420p s2_video.mp4
