@@ -96,6 +96,21 @@ function traceray(scene::Scene, ray::Ray, tmin, tmax, rec_depth=1)
     if (mirror_co == 0) || (rec_depth <= 0)
         return local_color
     end
+    if scene.id == 1
+
+
+tpRay = Vec3(0.545, 0.0, -0.545) 
+
+
+#rotate mirror_ray's direction (90 degrees clockwise) without changing it's origin
+new_dir = Vec3(-ray_dir[3], -ray_dir[2], ray_dir[1])
+
+                  #new origin      new direction
+mirror_ray = Ray(point - tpRay, -normalize(new_dir))
+
+
+
+end
     reflected_color = traceray(scene, mirror_ray, 1e-8, Inf, rec_depth-1)
     return (local_color*(1-mirror_co))+(reflected_color*mirror_co)
         
@@ -228,5 +243,28 @@ function getImages(scene, camera, height, width, out, amountx, amountz)
     end # end of idx loop    
 end
 
+
+function writevideo(fname, imgstack::Array{<:Color,3};
+                    overwrite=true, fps=30::UInt, options=``)
+    ow = overwrite ? `-y` : `-n`
+    h, w, nframes = size(imgstack)
+
+    open(`ffmpeg
+            -loglevel warning
+            $ow
+            -f rawvideo
+            -pix_fmt rgb24
+            -s:v $(h)x$(w)
+            -r $fps
+            -i pipe:0
+            $options
+            -vf "transpose=0"
+            -pix_fmt yuv420p
+            $fname`, "w") do out
+        for i = 1:nframes
+            write(out, convert.(RGB{N0f8}, clamp01.(imgstack[:,:,i])))
+        end
+    end
+end
 
 end # module WWURay

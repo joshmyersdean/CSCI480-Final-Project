@@ -16,11 +16,11 @@ using ..Materials
 ###### Generic Scene Data Type ######
 #####################################
 struct Scene
+    id::Int64
     background::RGB{Float32}
     objects::Array{Any,1}
     lights::Array{Any,1}
 end
-
 """ Structure to store data about an intersection
 of a ray with an object (a "hit")."""
 mutable struct HitRecord
@@ -51,12 +51,12 @@ struct Sphere
 end
 
 
-struct Portal
+mutable struct Portal
+    mesh::Array{Any, 1}
     center::Vec3
-    radiusX::Float64
-    radiusY::Float64
-    material::Material
+    buddy::Union{Portal, Nothing}
 end
+
 
 """ Ray-sphere intersection. """
 function ray_intersect(ray::Ray, object::Sphere)
