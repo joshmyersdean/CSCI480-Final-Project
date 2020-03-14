@@ -1,0 +1,12 @@
+.container h1 {
+    margin: 2rem 0;
+}
+
+.container h2 {
+    margin-bottom: 1rem;
+    font-size: 1.6rem;
+}
+
+section {
+    margin-bottom: 5em;
+}
