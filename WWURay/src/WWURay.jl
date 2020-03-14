@@ -166,20 +166,19 @@ function is_shadowed(scene, light::PointLight, point::Vec3)
 end
 
 # Main loop:
-function main(scene, camera, height, width, out)
-   if scene == 1
-	scene = TestScenes.portalScene1(height, width)[1]
+function main(scene, height, width, out)
+    if scene == 1
+	    scene = TestScenes.portalScene1(height, width)[1]
         camera = TestScenes.portalScene1(height, width)[2]
         getImages(scene, camera, height, width, out, 1, 0)
     elseif scene == 2
-	scene = TestScenes.portalScene2(height, width)[1]
+	    scene = TestScenes.portalScene2(height, width)[1]
         camera = TestScenes.portalScene2(height, width)[2]
         getImages(scene, camera, height, width, out, 1, -1)
     elseif scene == 3
 	    scene = TestScenes.portalScene3(height, width)[1]
         camera = TestScenes.portalScene3(height, width)[2]
-        getImages(scene, camera, height, width, out, 1, 0)
-        
+        getImages(scene, camera, height, width, out, 1, 0)   
    end
 end
 
@@ -227,7 +226,6 @@ function getImages(scene, camera, height, width, out, amountx, amountz)
         save(File(format"PNG", string(outfolder, outfname)), colorview(RGB, canvas))
 
     end # end of idx loop    
-
 end
 
 

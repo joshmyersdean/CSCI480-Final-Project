@@ -41,9 +41,8 @@ Now, you are ready to try our raytracer.
 ## Rendering Scene Images 
 We has three defaults scene for testing. Our main function to render a scene is like below:
 ```
-julia> WWURay.main(scene, camera, height, width, out)
+julia> WWURay.main(scene, height, width, out)
     scene: scene number [1, 2, or 3]
-    camera:
     height: canvas height
     width: canvas width
     out: prefix for a set of images files
