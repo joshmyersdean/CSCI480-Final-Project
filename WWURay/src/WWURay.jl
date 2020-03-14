@@ -42,6 +42,8 @@ function closest_intersect(objects::Array{Any, 1}, ray::Ray, tmin, tmax)
     count = 0
     # various cases for error handling
     for i ∈ objects 
+
+
         if typeof(i) == Scenes.Portal
              if count == 0
                  hit1 =  closest_intersect(i.mesh, ray, tmin, tmax)
@@ -50,6 +52,8 @@ function closest_intersect(objects::Array{Any, 1}, ray::Ray, tmin, tmax)
                 hit2 = closest_intersect(i.mesh, ray, tmin, tmax)
             end
         end
+
+
         hit = Scenes.ray_intersect(ray, i)
         if isnothing(hit) && isnothing(closestHit)
             continue
@@ -102,9 +106,12 @@ function in_bounds(t, tmin, tmax)
     return (t >= tmin) && (t <= tmax)
 end
 
+
+
 """ Trace a ray from orig along ray through scene, using Whitted recursive raytracing 
 limited to rec_depth recursive calls. """
 function traceray(scene::Scene, ray::Ray, tmin, tmax, rec_depth=1)
+
     # find the closest intersection
     closest_hitrec = closest_intersect(scene.objects, ray, tmin, tmax)
     if isnothing(closest_hitrec)
@@ -128,6 +135,23 @@ function traceray(scene::Scene, ray::Ray, tmin, tmax, rec_depth=1)
     if (mirror_co == 0) || (rec_depth <= 0)
         return local_color
     end
+
+if scene.id == 1
+
+
+tpRay = Vec3(0.545, 0.0, -0.545) 
+
+
+#rotate mirror_ray's direction (90 degrees clockwise) without changing it's origin
+new_dir = Vec3(-ray_dir[3], -ray_dir[2], ray_dir[1])
+
+                  #new origin      new direction
+mirror_ray = Ray(point - tpRay, -normalize(new_dir))
+
+
+
+end
+
     reflected_color = traceray(scene, mirror_ray, 1e-8, Inf, rec_depth-1)
     return (local_color*(1-mirror_co))+(reflected_color*mirror_co)
         

@@ -16,6 +16,7 @@ using ..Materials
 ###### Generic Scene Data Type ######
 #####################################
 struct Scene
+    id::Int64
     background::RGB{Float32}
     objects::Array{Any,1}
     lights::Array{Any,1}

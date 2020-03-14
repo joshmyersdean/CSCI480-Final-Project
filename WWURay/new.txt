@@ -1,0 +1,55 @@
+Portal 3
+Josh Meyers-Dean, Mina Shin, Ryan Wells
+
+
+
+Summary:
+
+
+
+Results:
+
+
+
+
+Instructions:
+Running this is very similar to running the Assignment 2 code.
+
+We start up julia like before:
+julia --project
+using Revise
+using WWURay
+
+At this point, we call
+
+...
+
+
+
+
+Code guide:
+
+
+
+
+
+scene 1 aerial:
+function camera_portal1(img_height, img_width)
+    eye = Vec3(7, 5, 7)
+    view = Vec3(2, 0.5, 0) - eye
+    up = Vec3(0, 1, 0)
+    focal = 1.0
+    Cameras.PerspectiveCamera(eye, view, up, focal, img_height, img_width)
+end
+
+
+scene 2 aerial: just add +5 to eye height
+
+scene 3 aerial:
+function camera_portal3(img_height, img_width)
+	eye = Vec3(-6,6,3)
+	view = Vec3(0,0.5,3) - eye
+	up = Vec3(0,1,0)
+	focal = 1.0
+	Cameras.PerspectiveCamera(eye, view, up, focal, img_height, img_width)
+end
