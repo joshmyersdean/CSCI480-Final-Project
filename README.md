@@ -1,7 +1,8 @@
 
 # CSCI480-Final-Project
 __Authors:__ Josh Myers-Dean, Mina Shin, Ryan Wells
-
+## Requirements
+Julia 1.3
 ## About
 In this project we simulate portals from the game portal. We use an implementation of a raytacer from our assignment 2 in CSCI 480. To view our writeup navigate to /finalReport and open report.html in your browser.
 
